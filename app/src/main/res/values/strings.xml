@@ -73,7 +73,7 @@
 
     <string name="current_version">当前版本</string>
     <string name="open_source_url">项目开源主页</string>
-    <string name="open_source_url_content">https://github.com/TakWolf/CNode-Material-Design</string>
+    <string name="open_source_url_content">https://github.com/goosling/CNode</string>
     <string name="about_cnode">关于CNode社区</string>
     <string name="about_cnode_content">https://cnodejs.org/about</string>
     <string name="about_author">关于作者</string>
@@ -83,7 +83,7 @@
     <string name="open_in_market">去商店评分</string>
     <string name="open_in_market_content">觉得赞就给个好评吧！</string>
     <string name="open_source_license">开放源代码许可</string>
-    <string name="about_copyright">Copyright © 2015&#8211;2016 TakWolf</string>
+    <string name="about_copyright">Copyright © 2015&#8211;2016 Goosling</string>
 
     <string name="no_market_install_in_system">系统中没有安装应用商店</string>
     <string name="no_browser_install_in_system">系统中没有安装浏览器</string>
