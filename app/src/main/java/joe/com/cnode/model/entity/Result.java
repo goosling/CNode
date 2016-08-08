@@ -6,8 +6,12 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.IOException;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 
 import joe.com.cnode.model.util.EntityUtils;
+import joe.com.cnode.util.FormatUtils;
 import retrofit2.Response;
 
 /**
@@ -40,7 +44,7 @@ public class Result {
     }
 
     public static <T extends Result> Error buildError(@NonNull Response<T> response) {
-        try{
+        try {
             return EntityUtils.gson.fromJson(response.errorBody().string(), Error.class);
         } catch (IOException | JsonSyntaxException e) {
             Error error = new Error();
@@ -67,7 +71,82 @@ public class Result {
                 case 500:
                     error.errorMessage = "服务器逻辑错误";
                     break;
+                case 502:
+                    error.errorMessage = "服务器网关错误";
+                    break;
+                case 504:
+                    error.errorMessage = "服务器网关超时";
+                    break;
+                default:
+                    error.errorMessage = response.message();
+                    break;
             }
+            return error;
+        }
+    }
+
+    public static Error buildError(@NonNull Throwable t) {
+        Error error = new Error();
+        error.success = false;
+        if(t instanceof UnknownHostException || t instanceof ConnectException) {
+            error.errorMessage = "网络无法连接";
+        } else if(t instanceof SocketTimeoutException) {
+            error.errorMessage = "网络访问超时";
+        } else if(t instanceof JsonSyntaxException) {
+            error.errorMessage = "响应数据格式错误";
+        } else {
+            error.errorMessage = "未知错误:" + t.getLocalizedMessage();
+        }
+        return error;
+    }
+
+    public static class Login extends Result {
+        private String id;
+
+        @SerializedName("loginname")
+        private String loginName;
+
+        @SerializedName("avatar_url")
+        private String avatarUrl;
+
+        public String getId() {
+            return id;
+        }
+
+        public String getLoginName() {
+            return loginName;
+        }
+
+        public String getAvatarUrl() {
+            return FormatUtils.getCompatAvatarUrl(avatarUrl);
+        }
+    }
+
+    public static class CreateTopic extends Result {
+        @SerializedName("topic_id")
+        private String topicId;
+
+        public String getTopicId() {
+            return topicId;
+        }
+    }
+
+    public static class ReplyTopic extends Result {
+
+        @SerializedName("reply_id")
+        private String replyId;
+
+        public String getReplyId() {
+            return replyId;
+        }
+    }
+
+    public static class UnReply extends Result {
+
+        private Reply.UpAction action;
+
+        public Reply.UpAction getAction() {
+            return action;
         }
     }
 }
