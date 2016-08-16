@@ -9,5 +9,17 @@ import joe.com.cnode.model.entity.Reply;
  */
 public interface ICreateReplyView {
 
-    void onUpReplyOk(@NonNull Reply reply);
+    void showWindow();
+
+    void dismissWindow();
+
+    void onAt(@NonNull Reply target, @NonNull Integer targetPosition);
+
+    void onContentError(@NonNull String message);
+
+    void onReplyTopicOk(@NonNull Reply reply);
+
+    void onReplyTopicStart();
+
+    void onReplyTopicFinish();
 }

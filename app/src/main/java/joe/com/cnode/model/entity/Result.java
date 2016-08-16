@@ -141,7 +141,7 @@ public class Result {
         }
     }
 
-    public static class UnReply extends Result {
+    public static class UpReply extends Result {
 
         private Reply.UpAction action;
 
