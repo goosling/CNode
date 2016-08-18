@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 
 import joe.com.cnode.model.entity.Result;
 import joe.com.cnode.ui.util.ActivityUtils;
+import okhttp3.Headers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -30,9 +31,9 @@ public class ForegroundCallback<T extends Result> implements Callback<T>, Callba
         if(ActivityUtils.isAlive(activity)) {
             boolean interrupt;
             if(response.isSuccessful()) {
-                interrupt = onResultOk(response, response.body());
+                interrupt = onResultOk(response.code(), response.headers(), response.body());
             } else {
-                interrupt = onResultError(response, Result.buildError(response));
+                interrupt = onResultError(response.code(), response.headers(), Result.buildError(response));
             }
 
             if(!interrupt) {
@@ -58,12 +59,12 @@ public class ForegroundCallback<T extends Result> implements Callback<T>, Callba
     }
 
     @Override
-    public boolean onResultOk(Response<T> response, T result) {
+    public boolean onResultOk(int code, Headers headers, T result) {
         return false;
     }
 
     @Override
-    public boolean onResultError(Response<T> response, Result.Error error) {
+    public boolean onResultError(int code, Headers headers, Result.Error error) {
         return false;
     }
 

@@ -13,7 +13,7 @@ import joe.com.cnode.model.storage.LoginShared;
 import joe.com.cnode.model.storage.SettingShared;
 import joe.com.cnode.presenter.contract.ICreateTopicPresenter;
 import joe.com.cnode.ui.view.ICreateTopicView;
-import retrofit2.Response;
+import okhttp3.Headers;
 
 /**
  * Created by JOE on 2016/8/16.
@@ -40,10 +40,11 @@ public class CreateTopicPresenter implements ICreateTopicPresenter {
                 content += "\n\n" + SettingShared.getTopicSignContent(activity);
             }
             createTopicView.onCreateTopicStart();
-            ApiClient.service.createTopic(LoginShared.getAccessToken(activity), tab, title, content).enqueue(new DefaultCallback<Result.CreateTopic>(activity) {
+            ApiClient.service.createTopic(LoginShared.getAccessToken(activity), tab, title, content)
+                    .enqueue(new DefaultCallback<Result.CreateTopic>(activity) {
 
                 @Override
-                public boolean onResultOk(Response<Result.CreateTopic> response, Result.CreateTopic result) {
+                public boolean onResultOk(int code, Headers headers, Result.CreateTopic result) {
                     createTopicView.onCreateTopicOk(result.getTopicId());
                     return false;
                 }
