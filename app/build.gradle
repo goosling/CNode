@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "joe.com.cnode"
-        minSdkVersion 9
+        minSdkVersion 11
         targetSdkVersion 24
         versionCode Integer.parseInt(new Date().format("yyyyMMdd"))
         versionName "1.0"

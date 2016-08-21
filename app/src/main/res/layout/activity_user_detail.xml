@@ -102,9 +102,9 @@
                 android:layout_marginTop="18dp"
                 android:layout_centerHorizontal="true"
                 app:matProg_barColor="@color/color_accent"
-                app:marProg_progressIndeterminate="true"
+                app:matProg_progressIndeterminate="true"
                 app:matProg_barWidth="4dp"
-                app:matProg_fillRadium="true"/>
+                app:matProg_fillRadius="true"/>
 
         </RelativeLayout>
 
