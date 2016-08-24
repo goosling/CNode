@@ -16,14 +16,17 @@ import joe.com.cnode.ui.fragment.UserDetailItemFragment;
 /**
  * Created by JOE on 2016/8/22.
  */
-public class UserDetailPageAdapter extends FragmentPagerAdapter {
+public class UserDetailPagerAdapter extends FragmentPagerAdapter {
 
     private final List<UserDetailItemFragment> fmList = new ArrayList<>();
+    private final String[] titles = {
+            "最近回复",
+            "最新发布",
+            "话题收藏"
+    };
 
-    private final String[] titles = {"最近回复", "最新发布", "话题收藏"};
-
-    public UserDetailPageAdapter(FragmentManager fm) {
-        super(fm);
+    public UserDetailPagerAdapter(@NonNull FragmentManager manager) {
+        super(manager);
         fmList.add(new UserDetailItemFragment());
         fmList.add(new UserDetailItemFragment());
         fmList.add(new UserDetailItemFragment());
@@ -36,16 +39,16 @@ public class UserDetailPageAdapter extends FragmentPagerAdapter {
 
     public void update(@NonNull List<Topic> topicList) {
         List<TopicSimple> topicSimpleList = new ArrayList<>();
-        for(Topic topic : topicList) {
+        for (Topic topic : topicList) {
             topicSimpleList.add(topic);
         }
-
         fmList.get(2).notifyDataSetChanged(topicSimpleList);
     }
 
     @Override
     public Fragment getItem(int position) {
-        return fmList.get(position);
+        //return fmList.get(position);
+        return null;
     }
 
     @Override
@@ -57,4 +60,5 @@ public class UserDetailPageAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position) {
         return titles[position];
     }
+
 }

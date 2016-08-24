@@ -11,26 +11,36 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
+import android.text.Html;
+import android.text.TextUtils;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
+import com.bumptech.glide.Glide;
 import com.pnikosis.materialishprogress.ProgressWheel;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 import joe.com.cnode.R;
+import joe.com.cnode.model.api.ApiDefine;
 import joe.com.cnode.model.entity.Topic;
 import joe.com.cnode.model.entity.User;
 import joe.com.cnode.presenter.contract.IUserDetailPresenter;
+import joe.com.cnode.presenter.implement.UserDetailPresenter;
+import joe.com.cnode.ui.adapter.UserDetailPagerAdapter;
 import joe.com.cnode.ui.base.StatusBarActivity;
 import joe.com.cnode.ui.listener.NavigationFinishClickListener;
+import joe.com.cnode.ui.util.Navigator;
 import joe.com.cnode.ui.util.ThemeUtils;
+import joe.com.cnode.ui.util.ToastUtils;
 import joe.com.cnode.ui.view.IUserDetailView;
 
 /**
@@ -104,36 +114,100 @@ public class UserDetailActivity extends StatusBarActivity implements IUserDetail
 
         toolbar.setNavigationOnClickListener(new NavigationFinishClickListener(this));
         toolbar.inflateMenu(R.menu.user_detail);
-        toolbar.setOnMenuItemClickListener(this);
+        toolbar.setOnMenuItemClickListener(new android.support.v7.widget.Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.action_open_in_browser:
+                        Navigator.openInBrowser(getApplicationContext(), ApiDefine.USER_LINK_URL_PREFIX + loginName);
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+
+        adapter = new UserDetailPagerAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(adapter);
+        viewPager.setOffscreenPageLimit(adapter.getCount());
+        tabLayout.setupWithViewPager(viewPager);
+
+        loginName = getIntent().getStringExtra(EXTRA_LOGIN_NAME);
+        tvLoginName.setText(loginName);
+
+        String avatarUrl = getIntent().getStringExtra(EXTRA_AVATAR_URL);
+        if(!TextUtils.isEmpty(avatarUrl)) {
+            Glide.with(this).load(avatarUrl).placeholder(R.drawable.image_placeholder)
+                    .dontAnimate().into(imgAvatar);
+        }
+
+        userDetailPresenter = new UserDetailPresenter(this, this);
+
+        userDetailPresenter.getUserAsyncTask(loginName);
     }
 
     @Override
-    public void onGetUserOk(@NonNull User user) {
+    protected void onSaveInstanceState(Bundle outState) {
 
+    }
+
+
+    @Override
+    public void onGetUserOk(@NonNull User user) {
+        Glide.with(this).load(user.getAvatarUrl()).placeholder(R.drawable.image_placeholder)
+                .dontAnimate().into(imgAvatar);
+        tvLoginName.setText(user.getLoginName());
+        if(TextUtils.isEmpty(user.getGithubUsername())) {
+            tvGithubUsername.setVisibility(View.INVISIBLE);
+            tvGithubUsername.setText(null);
+        } else {
+            tvGithubUsername.setVisibility(View.VISIBLE);
+            tvGithubUsername.setText(Html.fromHtml("<u>" + user.getGithubUsername()
+                    + "@github.com" + "</u>"));
+        }
+
+        tvCreateTime.setText("注册时间: "+  user.getCreateAt().toString("yyyy-MM-dd"));
+        tvScore.setText("积分：" + user.getScore());
+        adapter.update(user);
+        githubUsername = user.getGithubUsername();
     }
 
     @Override
     public void onGetCollectTopicListOk(@NonNull List<Topic> topicList) {
-
+        adapter.update(topicList);
     }
 
     @Override
     public void onGetUserError(@NonNull String message) {
-
+        ToastUtils.with(this).show(message);
     }
 
     @Override
     public void onGetUserStart() {
-
+        progressWheel.spin();
     }
 
     @Override
     public void onGetUserFinish() {
-
+        progressWheel.stopSpinning();
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem menuItem) {
         return false;
+    }
+
+    @OnClick({R.id.img_avatar, R.id.tv_github_username})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.img_avatar:
+                userDetailPresenter.getUserAsyncTask(loginName);
+                break;
+            case R.id.tv_github_username:
+                if(!TextUtils.isEmpty(githubUsername)) {
+                    Navigator.openInBrowser(this, "https://github.com/" + githubUsername);
+                }
+                break;
+        }
     }
 }
